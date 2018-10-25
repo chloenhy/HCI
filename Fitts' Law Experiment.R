@@ -57,9 +57,22 @@ fourth <- subset(exp1, ID > 2.893085)
 
 5 - Scatter plot: ID v.s. Time
 Method 1:
-q4 <- setNames(q4, c("ID", "Mean Movement Time"))
-plot(q4, type='p', main="Effect of ID on movement time", xlab="ID (bits)", ylab="Mean Time (millisecond)")
-abline(lm(q4$meanTime~q4$ID))
+q4 <- setNames(q4, c("ID", "meanTime"))
+plotq4 <- plot(q4, type='p', main="Effect of ID on movement time", xlab="ID (bits)", ylab="Mean Time (millisecond)")
+plotq4 <- abline(lm(q4$meanTime~q4$ID)) # challenge 2
+
+# add device ~ time, challenge 3
+deviceTable <- aggregate(exp1$Time, list(exp1$Device, exp1$ID), mean)
+deviceTable <- setNames(deviceTable, c("Device", "ID", "meanTime"))
+
+mouse <- subset(deviceTable, deviceTable$Device=='Mouse')
+trackpad <- subset(deviceTable, deviceTable$Device=='Trackpad')
+xyplot(deviceTable$meanTime ~ mouse$ID + trackpad$ID, col = c("black", "red"), auto.key=T,  type = c('p','p'))
+
+# above need to add regression line for each device
+
+
+
 
 Method 2: 
 q5 <- data.frame(ID = c(2.247928, 2.681824, 2.893085, 3.36257), meanTime = c(mean(first$Time), mean(second$Time), mean(third$Time), mean(fourth$Time))
@@ -72,13 +85,14 @@ print(lm(q5$meanTime~q5$ID))
 exp1$throughput <- (exp1$ID/(exp1$Time/1000))
                  
 7 - Compute mean TP by devices
-aggregate(exp1$throughput, list(exp1$Device), mean)
-                 
-   Group.1        x
+TPbyDevice <- aggregate(exp1$throughput, list(exp1$Device), mean)
+TPbyDevice <- setNames(TPbyDevice, c("Device", "TP"))
+TPbyDevice
+    Device       TP
 1    Mouse 3.666732
 2 Trackpad 3.423902
                  
                  
 8 - Bar chart: Device v.s. mean TP 
-XXX
+barplot(TPbyDevice$TP, ylab = "Throughput (bits/sec)", main="Throuhput of mouse and trackpad", names.arg=c("Mouse", "Trackpad"))
                  
